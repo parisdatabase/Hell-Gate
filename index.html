@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hell's Gate - Underground Market</title>
+    <style>
+        /* General Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Courier New', monospace;
+            background-color: #0a0a0a;
+            color: #33ff33;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Matrix-like Animation */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0.97), rgba(0,0,0,0.97));
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(to right, #000000, #1a0000);
+            padding: 30px;
+            border-bottom: 2px solid #ff0000;
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .header h1 {
+            color: #ff0000;
+            font-size: 2.5em;
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #ff3333;
+            font-style: italic;
+        }
+        .header a {
+        
+            color: #ff0000;
+            font-size: large;
+            text-decoration: none;
+            margin: 5px;
+            text-shadow: 0 0 10px #ff0000;
+            background: linear-gradient(to right, #000000, #1a0000);
+ }
+        .header a:hover {
+            border-bottom: 2px solid #33ff33;
+        }
+        /* Product Container */
+        .product-container {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px;
+            gap: 20px;
+            scroll-behavior: smooth;
+            background: rgba(0, 0, 0, 0.8);
+            margin: 20px;
+            border: 1px solid #33ff33;
+        }
+
+        .product-container::-webkit-scrollbar {
+            height: 8px;
+            background: #000;
+        }
+
+        .product-container::-webkit-scrollbar-thumb {
+            background: #33ff33;
+            border-radius: 4px;
+        }
+
+        /* Product Card */
+        .product {
+            flex: 0 0 300px;
+            padding: 20px;
+            background: rgba(0, 20, 0, 0.9);
+            border: 1px solid #33ff33;
+            border-radius: 5px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(51, 255, 51, 0.1), transparent);
+            z-index: 1;
+            transform: translateX(-100%);
+            transition: 0.5s;
+        }
+
+        .product:hover::before {
+            transform: translateX(100%);
+        }
+
+        .product img {
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border: 1px solid #33ff33;
+            box-shadow: 0 0 10px rgba(51, 255, 51, 0.3);
+        }
+
+        .product h2 {
+            color: #ff3333;
+            margin: 15px 0;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .product p {
+            color: #33ff33;
+            margin: 10px 0;
+        }
+
+        .product button {
+            background: #1a0000;
+            color: #33ff33;
+            border: 1px solid #33ff33;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        .product button:hover {
+            background: #33ff33;
+            color: #000;
+            box-shadow: 0 0 15px #33ff33;
+        }
+
+        /* Cart Styles */
+        .cart {
+            background: rgba(0, 10, 0, 0.95);
+            padding: 20px;
+            border: 1px solid #33ff33;
+            width: 300px;
+            position: fixed;
+            top: 20px;
+            right: -310px;
+            transition: 0.5s;
+            z-index: 1000;
+            box-shadow: -5px 0 15px rgba(51, 255, 51, 0.2);
+        }
+
+        .cart.active {
+            right: 0;
+        }
+
+        .cart-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1a0000;
+            color: #33ff33;
+            border: 1px solid #33ff33;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1001;
+            font-family: 'Courier New', monospace;
+        }
+
+        .cart h2 {
+            color: #ff3333;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .cart-items {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px;
+            border-bottom: 1px solid #33ff33;
+        }
+
+        .remove-item {
+            color: #ff3333;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .cart-total {
+            border-top: 2px solid #33ff33;
+            padding-top: 10px;
+            margin-top: 10px;
+            text-align: right;
+            color: #ff3333;
+        }
+
+        /* Promo Section */
+        .promo {
+            background: rgba(26, 0, 0, 0.9);
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ff3333;
+        }
+
+        .promo h2 {
+            color: #ff3333;
+            margin-bottom: 10px;
+        }
+
+        .promo button {
+            background: #1a0000;
+            color: #33ff33;
+            border: 1px solid #33ff33;
+            padding: 10px 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+
+        }
+
+        .promo button:hover {
+            background: #33ff33;
+            color: #000;
+            box-shadow: 0 0 15px #33ff33;
+        }
+        /* Footer */
+        .footer {
+            background: linear-gradient(to right, #000000, #1a0000);
+            padding: 20px;
+            margin-top: 20px;
+            border-top: 2px solid #ff0000;
+        }
+
+        .footer p {
+            color: #33ff33;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(51, 255, 51, 0.9);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Warning Banner */
+        .warning-banner {
+            background: #ff0000;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg"></div>
+    
+    <div class="warning-banner">
+        WARNING: RESTRICTED ACCESS - SECURE CONNECTION REQUIRED
+    </div>
+
+    <div class="header">
+        <h1>HELL'S GATE</h1>
+        <p>[ Pasar Gelap Terbesar Di Asia - Resiko Di Tanggung Sendiri]</p>
+        <a href="toko3.html">Beranda</a>
+        <a href="jasa.html">Jasa</a>
+        <a href="">TentangKami</a>
+        <a href="">Lokasi</a>
+    </div>
+
+    <div class="product-container">
+        <div class="product">
+            <img src="Jantung.jpg" alt="Jantung">
+            <h2>Jantung</h2>
+            <p>Harga: US$200.000 / pcs</p>
+            <p class="stock">Stock: 5 units</p>
+            <button onclick="addToCart('Jantung', 200000)">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="Hati.jpg" alt="Ginjal">
+            <h2>Ginjal</h2>
+            <p>Harga: US$160.000 / pcs</p>
+            <p class="stock">Stock: 8 units</p>
+            <button onclick="addToCart('Ginjal', 160000)">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="Mata.jpg" alt="Sepasang Bola Mata">
+            <h2>Sepasang Bola Mata</h2>
+            <p>Harga: US$2.000 / pcs</p>
+            <p class="stock">Stock: 12 units</p>
+            <button onclick="addToCart('Bola Mata', 2000)">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="ati.jpg" alt="Hati">
+            <h2>Hati</h2>
+            <p>Harga: US$180.000 / pcs</p>
+            <p class="stock">Stock: 3 units</p>
+            <button onclick="addToCart('Hati', 180000)">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="download (3).jpeg" alt="Darah Segar">
+            <h2>Darah Segar</h2>
+            <p>Harga: US$100.000 / L</p>
+            <p class="stock">Stock: 15 L</p>
+            <button onclick="addToCart('Darah', 100000)">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="usus.jpg" alt="Darah Segar">
+            <h2>usus</h2>
+            <p>Harga: US$150.000 / L</p>
+            <p class="stock">Stock: 15 Pcs</p>
+            <button onclick="addToCart('Usus', 150000)">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="Limpa.jpg" alt="Darah Segar">
+            <h2>Limpa</h2>
+            <p>Harga: US$170.000 / L</p>
+            <p class="stock">Stock: 15 Pcs</p>
+            <button onclick="addToCart('Limpa', 170000)">Add to Cart</button>
+        </div>
+
+        <div class="product">
+            <img src="Paru-paru.jpg" alt="Darah Segar">
+            <h2>Paru-paru</h2>
+            <p>Harga: US$190.000 / pcs</p>
+            <p class="stock">Stock: 15 Pcs</p>
+            <button onclick="addToCart('Paru-paru', 190000)">Add to Cart</button>
+        </div>
+
+
+    </div>
+
+    <button class="cart-toggle" onclick="toggleCart()">Cart [0]</button>
+
+    <div class="cart">
+        <h2>Shopping Cart</h2>
+        <div class="cart-items">
+            <!-- Cart items will be added here dynamically -->
+        </div>
+        <div class="cart-total">
+            Total: US$ 0
+        </div>
+    </div>
+
+    <div class="promo">
+        <h2>[ PAKET A]</h2>
+        <p>BELI 2 JANTUNG, GRATIS 2 kantong darah premium</p>
+        <button onclick="addToCart('Paket A', 450000)">Add to Cart</button>
+    </div>
+
+    <div class="promo">
+        <h2>[ PAKET B]</h2>
+        <p>BELI 2 Ginjal, GRATIS 3 kantong darah premium</p>
+        <button onclick="addToCart('Paket B', 350000)">Add to Cart</button>
+    </div>
+
+    <div class="promo">
+        <h2>[ PAKET C]</h2>
+        <p>BELI 2 JANTUNG + 1 hati + 1 ginjal, GRATIS Sepasang bola mata</p>
+        <button onclick="addToCart('Paket C', 800000)">Add to Cart</button>
+    </div>
+
+    <div class="footer">
+        <p>SECURE CONTACT: info@HellsGate.onion | Hubungi Faris Raja Iblis: +62 821 1566 4929</p>
+        <p style="font-size: 0.8em; margin-top: 10px;">Akses Hanya Untuk Pelanggan. Awasi Data Anda.</p>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let cart = [];
+        let cartVisible = false;
+
+        function toggleCart() {
+            const cartElement = document.querySelector('.cart');
+            cartVisible = !cartVisible;
+            cartElement.classList.toggle('active');
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+        }
+
+        function addToCart(itemName, price) {
+            cart.push({ name: itemName, price: price });
+            updateCartDisplay();
+            showNotification(`${itemName} added to cart`);
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartDisplay();
+            showNotification("Item removed from cart");
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.querySelector('.cart-items');
+            const cartToggle = document.querySelector('.cart-toggle');
+            cartItems.innerHTML = '';
+            
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item';
+                itemElement.innerHTML = `
+                    <span>${item.name}</span>
+                    <span>${formatPrice(item.price)} 
+                    <span class="remove-item" onclick="removeFromCart(${index})">×</span></span>
+                `;
+                cartItems.appendChild(itemElement);
+                total += item.price;
+            });
+
+            document.querySelector('.cart-total').innerHTML = `Total: ${formatPrice(total)}`;
+            cartToggle.innerHTML = `Cart [${cart.length}]`;
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
+        }
+
+        // Matrix-like background effect
+        function createMatrixEffect() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            document.querySelector('.matrix-bg').appendChild(canvas);
+
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.opacity = '0.1';
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const characters = '01';
+            const fontSize = 10;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#33ff33';
+                ctx.font = `${fontSize}px monospace`;
+
+                for (let i = 0; i < drops.length; i++) {
+                    const text = characters[Math.floor(Math.random() * characters.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+            }
+
+            setInterval(draw, 35);
+        }
+
+        createMatrixEffect();
+    </script>
+</body>
+</html>
